@@ -1,0 +1,2 @@
+DROP INDEX IF EXISTS posts_uuid_idx;
+DROP TABLE IF EXISTS posts;

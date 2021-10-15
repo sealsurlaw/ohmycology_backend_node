@@ -1,0 +1,14 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4(),
+    user_id_1 INTEGER NOT NULL,
+    user_id_2 INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS messages_uuid_idx ON messages (uuid);
+CREATE INDEX IF NOT EXISTS messages_user_id_1_idx ON messages (user_id_1);
+CREATE INDEX IF NOT EXISTS messages_user_id_2_idx ON messages (user_id_2);

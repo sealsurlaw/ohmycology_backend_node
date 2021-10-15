@@ -1,0 +1,4 @@
+DROP INDEX IF EXISTS messages_uuid_idx;
+DROP INDEX IF EXISTS messages_user_id_1_idx;
+DROP INDEX IF EXISTS messages_user_id_2_idx;
+DROP TABLE IF EXISTS messages;

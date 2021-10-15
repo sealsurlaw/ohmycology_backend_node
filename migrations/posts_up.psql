@@ -1,0 +1,28 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS posts (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4(),
+    user_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    color TEXT,
+    height_in_cm INTEGER,
+    diameter_in_cm INTEGER,
+    cap TEXT,
+    stem TEXT,
+    underside TEXT,
+    spore_print TEXT,
+    texture TEXT,
+    substrate TEXT,
+    location TEXT,
+    description TEXT,
+    family TEXT,
+    genus TEXT,
+    common_name TEXT,
+    edible TEXT,
+    image BYTEA,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS posts_uuid_idx ON posts (uuid);

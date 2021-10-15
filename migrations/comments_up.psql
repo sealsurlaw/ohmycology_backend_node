@@ -1,0 +1,15 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS comments (
+    id SERIAL PRIMARY KEY,
+    uuid UUID DEFAULT uuid_generate_v4(),
+    post_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    deleted_at TIMESTAMP WITH TIME ZONE
+);
+
+CREATE INDEX IF NOT EXISTS comments_uuid_idx ON comments (uuid);
+CREATE INDEX IF NOT EXISTS comments_post_id_idx ON comments (post_id);
+CREATE INDEX IF NOT EXISTS comments_user_id_idx ON comments (user_id);
