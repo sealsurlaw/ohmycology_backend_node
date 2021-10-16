@@ -1,6 +1,7 @@
 import { Request, Response, Router } from "express";
 import { UploadedFile } from "express-fileupload";
 import { Post } from "../entities/post";
+import { sanitizeUser } from "../helpers/sanitize_helper";
 import { findPostByUuid, listPosts, savePost, updatePostImage } from "../store/post_store";
 
 var express = require('express')
@@ -13,6 +14,7 @@ router.post("/", (req: Request, res: Response) => {
 
     savePost(req.body)
         .then(post => {
+            post.user = sanitizeUser(post.user!)
             return res.send(post)
         })
 })
@@ -35,6 +37,9 @@ router.post("/:postUuid/image", (req: Request, res: Response) => {
 router.get("/", (req: Request, res: Response) => {
     listPosts()
         .then((posts: Post[]) => {
+            posts.forEach(post => {
+                post.user = sanitizeUser(post.user!)
+            })
             return res.send(posts)
         })
 })
@@ -46,6 +51,7 @@ router.get("/:postUuid", (req: Request, res: Response) => {
                 return res.sendStatus(404)
             }
 
+            post.user = sanitizeUser(post.user!)
             return res.send(post)
         })
 })
