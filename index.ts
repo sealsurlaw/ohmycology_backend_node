@@ -10,6 +10,8 @@ const express = require('express')
 const app: Application = express()
 const port: number = 8080
 const bodyParser = require('body-parser')
+const cors = require('cors')
+const fileUpload = require('express-fileupload')
 
 app.get('/ping', (req: Request, res: Response) => {
   res.sendStatus(200)
@@ -17,6 +19,8 @@ app.get('/ping', (req: Request, res: Response) => {
 
 // Middleware
 app.use(bodyParser.json())
+app.use(cors())
+app.use(fileUpload())
 
 // Unprotected Routes
 app.use("/", unprotectedRouter)

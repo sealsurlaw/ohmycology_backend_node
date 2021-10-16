@@ -21,7 +21,7 @@ interface Post {
     genus?: string,
     commonName?: string,
     edible?: string,
-    image?: File,
+    image?: Buffer,
     comments?: Comment[],
     createdAt?: Date,
     deletedAt?: Date,

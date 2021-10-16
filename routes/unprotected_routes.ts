@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import { Post } from "../entities/post";
 import { User } from "../entities/user";
+import { findPostByUuid, findPostImageByUuid } from "../store/post_store";
 import { findUserByUsername, saveUser } from "../store/user_store";
 
 var express = require('express')
@@ -32,18 +34,33 @@ router.post("/login", (req: Request, res: Response) => {
         .then((user: User) => {
             const bcrypt = require('bcrypt');
             bcrypt.compare(password, user.password).then((result: boolean) => {
-                console.log(result)
                 if (result === true) {
                     const token = jwt.sign({
                         id: user.uuid
                     }, process.env.JWT_SECRET, { expiresIn: '365d' });
 
-                    return res.send(token)
+                    return res.send({ user, token })
                 }
                 else {
                     return res.sendStatus(401)
                 }
             });
+        })
+})
+
+router.get("/posts/:postUuid/image", (req: Request, res: Response) => {
+    findPostImageByUuid(req.params.postUuid)
+        .then((image?: Buffer) => {
+            if (image === undefined) {
+                return res.sendStatus(404)
+            }
+
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.send(image)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.sendStatus(500)
         })
 })
 

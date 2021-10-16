@@ -54,15 +54,97 @@ const savePost = async (post: Post): Promise<Post> => {
     return p!
 }
 
-const updatePostImage = (image: File, postId: number) => {
-    image.arrayBuffer()
-        .then((imageBuffer: ArrayBuffer) => {
-            db.any(`
-                UPDATE users SET
-                    image = $1
-                WHERE post_id = $2
-        `, [imageBuffer, postId])
-        })
+const updatePostImage = async (image: Buffer, postUuid: string) => {
+    await db.any(`
+        UPDATE posts SET
+            image = $1
+        WHERE uuid = $2
+    `, [image, postUuid])
+}
+
+const listPosts = async (): Promise<Post[]> => {
+    const data = await db.any(`
+        SELECT
+            p.id,
+            p.uuid,
+            p.user_id,
+            u.uuid user_uuid,
+            u.role,
+            u.username,
+            u.email,
+            u.first_name,
+            u.last_name,
+            u.bio,
+            u.created_at user_created_at,
+            u.deleted_at user_deleted_at,
+            p.title,
+            p.color,
+            p.height_in_cm,
+            p.diameter_in_cm,
+            p.cap,
+            p.stem,
+            p.underside,
+            p.spore_print,
+            p.texture,
+            p.substrate,
+            p.location,
+            p.description,
+            p.family,
+            p.genus,
+            p.common_name,
+            p.edible,
+            p.created_at,
+            p.deleted_at
+        FROM posts p
+        LEFT JOIN users u ON u.id = p.user_id
+    `)
+
+    const posts: Post[] = []
+
+    if (data.length === 0) {
+        return posts
+    }
+
+    data.forEach(datum => {
+        const post: Post = {
+            id: datum.id,
+            uuid: datum.uuid,
+            user: {
+                id: datum.user_id,
+                uuid: datum.user_uuid,
+                role: datum.role,
+                username: datum.username,
+                email: datum.email,
+                firstName: datum.first_name,
+                lastName: datum.last_name,
+                bio: datum.bio,
+                createdAt: datum.user_created_at,
+                deletedAt: datum.user_deleted_at,
+            },
+            title: datum.title,
+            color: datum.color,
+            heightInCm: datum.height_in_cm,
+            diameterInCm: datum.diameter_in_cm,
+            cap: datum.cap,
+            stem: datum.stem,
+            underside: datum.underside,
+            sporePrint: datum.spore_print,
+            texture: datum.texture,
+            substrate: datum.substrate,
+            location: datum.location,
+            description: datum.description,
+            family: datum.family,
+            genus: datum.genus,
+            commonName: datum.common_name,
+            edible: datum.edible,
+            createdAt: datum.created_at,
+            deletedAt: datum.deleted_at,
+        }
+
+        posts.push(post)
+    })
+
+    return posts
 }
 
 const findPostById = async (id: number): Promise<Post | undefined> => {
@@ -162,4 +244,18 @@ const findPostByUuid = async (uuid: string): Promise<Post | undefined> => {
     return findPostById(data.id)
 }
 
-export { savePost, updatePostImage, findPostById, findPostByUuid }
+const findPostImageByUuid = async (uuid: string): Promise<Buffer | undefined> => {
+    const data = await db.one(`
+        SELECT image
+        FROM posts
+        WHERE uuid = $1
+    `, [uuid])
+
+    if (data === undefined) {
+        return undefined
+    }
+
+    return data.image
+}
+
+export { savePost, updatePostImage, listPosts, findPostById, findPostByUuid, findPostImageByUuid }

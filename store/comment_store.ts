@@ -46,7 +46,8 @@ const findCommentsByPostId = async (postId: number): Promise<Comment[]> => {
         FROM comments c
         LEFT JOIN users u ON u.id = c.user_id
         WHERE
-            post_id = $1
+            c.post_id = $1 AND
+            c.deleted_at IS NULL
     `, [postId])
 
     if (data.length === 0) {
@@ -132,4 +133,14 @@ const findCommentById = async (id: number): Promise<Comment | undefined> => {
     }
 }
 
-export { saveComment, findCommentsByPostId }
+const deletedCommentByUuid = async (uuid: string) => {
+    return await db.one(`
+        UPDATE comments
+        SET
+            deleted_at = NOW()
+        WHERE
+            uuid = $1
+    `, [uuid])
+}
+
+export { saveComment, findCommentsByPostId, deletedCommentByUuid }
