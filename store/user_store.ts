@@ -70,4 +70,24 @@ const findUserByUuid = async (uuid: string): Promise<User> => {
     return findUserById(data.id)
 }
 
-export { saveUser, findUserById, findUserByUsername, findUserByUuid };
+const updateUserByUuid = async (uuid: string, user: User) => {
+    await db.any(`
+        UPDATE users SET
+            first_name = $1,
+            last_name = $2,
+            email = $3,
+            username = $4,
+            bio = $5
+        WHERE
+            uuid = $6
+    `, [
+        user.firstName,
+        user.lastName,
+        user.email,
+        user.username,
+        user.bio,
+        uuid
+    ])
+}
+
+export { saveUser, findUserById, findUserByUsername, findUserByUuid, updateUserByUuid };

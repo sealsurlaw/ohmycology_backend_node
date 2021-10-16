@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { User } from "../entities/user";
-import { findUserByUsername } from "../store/user_store";
+import { findUserByUsername, updateUserByUuid } from "../store/user_store";
 
 var express = require('express')
 var router = express.Router()
@@ -13,6 +13,17 @@ router.get("/:username", (req: Request, res: Response) => {
             }
 
             return res.send(user)
+        })
+})
+
+router.put("/:uuid", (req: Request, res: Response) => {
+    updateUserByUuid(req.params.uuid, req.body)
+        .then(() => {
+            return res.sendStatus(200)
+        })
+        .catch(err => {
+            console.log(err)
+            return res.sendStatus(500)
         })
 })
 
